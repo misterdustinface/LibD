@@ -1,9 +1,5 @@
 package base;
 
-//public interface Requestible {
-//	void request();
-//}
-
 public abstract class Requestible {
 
 	final public void request() {
