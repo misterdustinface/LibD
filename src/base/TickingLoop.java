@@ -11,14 +11,19 @@ public class TickingLoop implements Runnable {
 	final private LinkedList<VoidFunctionPointer> functions;
 	final private StopwatchTimer iterationStopwatch;
 	private long millisAllowedPerUpdate = 1000 / 60;
+	private volatile boolean isPaused;
 	
 	public TickingLoop() {
 		iterationStopwatch = new StopwatchTimer();
 		functions = new LinkedList<VoidFunctionPointer>();
+		isPaused = false;
 	}
 	
 	public void setUpdatesPerSecond(int UPS) {
-		millisAllowedPerUpdate = 1000 / UPS;
+		isPaused = (UPS == 0);
+		if (!isPaused) {
+			millisAllowedPerUpdate = 1000 / UPS;
+		}
 	}
 
 	public void addFunction(VoidFunctionPointer function) {
@@ -28,7 +33,9 @@ public class TickingLoop implements Runnable {
 	public void run() {
 		for (;;) {
 			iterationStopwatch.reset();
-			executeAllSpecifiedFunctions();
+			if (!isPaused) {
+				executeAllSpecifiedFunctions();
+			}
 			sleep();
 		}
 	}
