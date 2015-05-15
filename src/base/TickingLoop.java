@@ -20,24 +20,31 @@ public class TickingLoop implements Runnable {
 	}
 	
 	public void setUpdatesPerSecond(int UPS) {
-		isPaused = (UPS == 0);
-		if (!isPaused) {
+		isPaused = (UPS <= 0);
+		if (!isPaused()) {
 			millisAllowedPerUpdate = 1000 / UPS;
 		}
 	}
 
 	public void addFunction(VoidFunctionPointer function) {
+		if (function == null) {
+			throw new NullPointerException();
+		}
 		functions.add(function);
 	}
 	
 	public void run() {
-		for (;;) {
+		while (!shouldQuitRunning()) {
 			iterationStopwatch.reset();
-			if (!isPaused) {
+			if (!isPaused()) {
 				executeAllSpecifiedFunctions();
 			}
 			sleep();
 		}
+	}
+	
+	public boolean isPaused() {
+		return isPaused;
 	}
 	
 	private void executeAllSpecifiedFunctions() {
@@ -49,8 +56,9 @@ public class TickingLoop implements Runnable {
 	private void sleep() {
 		try {
 			Thread.sleep(getSleepTime());
-		} catch (Exception e) {
+		} catch (InterruptedException e) {
 			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 	}
 	
@@ -61,4 +69,7 @@ public class TickingLoop implements Runnable {
 		return sleeptime;
 	}
 	
+	private boolean shouldQuitRunning() {
+		return Thread.currentThread().isInterrupted();
+	}
 }

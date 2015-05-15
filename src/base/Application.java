@@ -1,17 +1,17 @@
 package base;
 
-import java.util.LinkedList;
+import java.util.HashSet;
 
 import datastructures.Table;
 
 public class Application {
 	
 	final private Table<Thread> threads;
-	final private LinkedList<String> names;
+	final private HashSet<String> names;
 	
 	public Application() {
 		threads = new Table<Thread>();
-		names = new LinkedList<String>();
+		names = new HashSet<String>();
 	}
 	
 	public void setMain(TickingLoop PROGRAM_MAIN) {
@@ -26,9 +26,13 @@ public class Application {
 		threads.insert(name, newThread);
 	}
 	
+	public String[] getComponentNames() {
+		return names.toArray(new String[]{});
+	}
+	
 	public void start() {
 		for (String name : names) {
-			startThread(threads.get(name));
+			startComponent(name);
 		}
 	}
 	
@@ -48,13 +52,14 @@ public class Application {
 		if (!thread.isAlive()) {
 			thread.start();
 		} else {
-			thread.notify();
+			synchronized (thread) { thread.notify(); }
 		}
 	}
 	
 	private void stopThread(Thread thread) {
+		thread.interrupt();
 		try {
-			thread.wait();
+			synchronized (thread) { thread.wait(); }
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
