@@ -2,12 +2,13 @@ package datastructures;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import base.Reusable;
 
-final public class Table <ItemType> implements Reusable {
+final public class Table <ItemType> implements Reusable, Iterable<ItemType> {
 
 	private Map<String, ItemType> map;
 	
@@ -59,6 +60,10 @@ final public class Table <ItemType> implements Reusable {
 
 	public void reconstruct() {
 		map.clear();
+	}
+	
+	public Iterator<ItemType> iterator() {
+		return new TableIterator<ItemType>(this, getNames());
 	}
 
 }
